@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy MiniGame</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: linear-gradient(to bottom, #4facfe, #00f2fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        canvas {
+            background: linear-gradient(to bottom, #87ceeb, #d0f4f7);
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            touch-action: none;
+        }
+
+        #fullscreenBtn {
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            /* left: 0; */
+            width: 100%;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.35);
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 12px 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+            color: #333;
+        }
+
+        .navbar a {
+            padding: 5px;
+            background-color: #0037ff;
+            border: 2px solid #4facfe;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #ffffff;
+            margin-left: 18px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .navbar a:hover {
+            color: var(--accent2);
+        }
+
+        body {
+            padding-top: 70px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <h2>Only for Firuzæ</h2>
+        <div class="links">
+            <a href="index.html">Home</a>
+            <a href="flappy.html">Flappy MiniGame</a>
+        </div>
+    </div>
+
+    <button id="fullscreenBtn">⛶ Tam ekran</button>
+    <canvas id="game" width="400" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("game");
+        const ctx = canvas.getContext("2d");
+        const btn = document.getElementById("fullscreenBtn");
+
+        let birdY, birdV, gravity = 0.15, jump = -4;
+        let pipes, speed = 2.5, gap = 160;
+        let score, gameOver;
+
+        function reset() {
+            birdY = 200;
+            birdV = 0;
+            pipes = [newPipe()];
+            score = 0;
+            gameOver = false;
+        }
+
+        function newPipe() {
+            const top = Math.random() * 300 + 50;
+            return { x: canvas.width, top, bottom: top + gap };
+        }
+
+        function update() {
+            if (gameOver) return;
+            birdV += gravity;
+            birdY += birdV;
+            if (birdY > canvas.height - 12 || birdY < 0) gameOver = true;
+
+            for (let p of pipes) {
+                p.x -= speed;
+                if (p.x + 50 === 80) score++;
+                if (
+                    80 + 12 > p.x && 80 - 12 < p.x + 50 &&
+                    (birdY - 12 < p.top || birdY + 12 > p.bottom)
+                ) gameOver = true;
+            }
+
+            if (pipes[pipes.length - 1].x < canvas.width - 200) pipes.push(newPipe());
+            if (pipes[0].x < -60) pipes.shift();
+        }
+
+        function draw() {
+            ctx.fillStyle = "#70c5ce";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let p of pipes) {
+                ctx.fillStyle = "#2e8b57";
+                ctx.strokeStyle = "#145c2e";
+                ctx.lineWidth = 4;
+
+                ctx.fillRect(p.x, 0, 40, p.top);
+                ctx.strokeRect(p.x, 0, 45, p.top);
+
+                ctx.fillRect(p.x, p.bottom, 40, canvas.height - p.bottom);
+                ctx.strokeRect(p.x, p.bottom, 45, canvas.height - p.bottom);
+            }
+
+            // bird
+            ctx.save();
+            ctx.translate(80, birdY);
+            ctx.scale(1.2, 1.2);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(0, -10, -12, -10, -12, 2);
+            ctx.bezierCurveTo(-12, 12, 0, 16, 0, 22);
+            ctx.bezierCurveTo(0, 16, 12, 12, 12, 2);
+            ctx.bezierCurveTo(12, -10, 0, -10, 0, 0);
+            ctx.fillStyle = "red";
+            ctx.fill();
+            ctx.restore();
+
+            //score
+            ctx.fillStyle = "white";
+            ctx.font = "18px sans-serif";
+            ctx.fillText("Point: " + score, 10, 25);
+
+            if (gameOver) {
+                ctx.fillStyle = "rgba(0,0,0,0.6)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#fff";
+                ctx.font = "28px sans-serif";
+                ctx.fillText("Game Over!", 120, 290);
+                ctx.font = "18px sans-serif";
+                ctx.fillText("Touch screen → Try again", 85, 330);
+            }
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        function flap() {
+            if (gameOver) reset();
+            birdV = jump;
+        }
+
+        canvas.addEventListener("mousedown", flap);
+        canvas.addEventListener("touchstart", e => { e.preventDefault(); flap(); });
+
+        btn.addEventListener("click", () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        });
+
+        reset();
+        loop();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="az">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mood Booster Only For Firuzæ</title>
+  <style>
+    :root {
+      --bg1: #ff9a9e;
+      --bg2: #fad0c4;
+      --card: #ffffffcc;
+      --glass: rgba(255, 255, 255, 0.12);
+      --accent: #6a11cb;
+      --accent2: #2575fc;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color: #111
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0px;
+      height: 80vh;
+    }
+
+    .scene {
+      width: min(1100px, 98vw);
+      max-width: 1100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.55));
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(23, 23, 23, 0.12);
+      backdrop-filter: blur(6px);
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 30px;
+      letter-spacing: -0.5px
+    }
+
+    p.lead {
+      margin: 0 0 18px 0;
+      opacity: 0.9
+    }
+
+    .message {
+      font-size: 20px;
+      padding: 18px 20px;
+      border-radius: 14px;
+      background: var(--card);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      text-align: center;
+      max-width: 820px;
+      min-height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .gif-wrap {
+      margin-top: 16px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .gif {
+      width: 260px;
+      height: 260px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      transform-origin: center;
+      transition: transform .45s cubic-bezier(.2, .9, .3, 1)
+    }
+
+    .gif.pop {
+      transform: scale(1.05) rotate(-2deg)
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+      justify-content: center
+    }
+
+    button.primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: white;
+      border: 0;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 26px rgba(100, 80, 200, 0.18);
+      transition: transform .12s ease, box-shadow .12s ease
+    }
+
+    button.primary:active {
+      transform: translateY(2px);
+      box-shadow: 0 6px 14px rgba(100, 80, 200, 0.12)
+    }
+
+    button.ghost {
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer
+    }
+
+    .side {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.3));
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-start;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06)
+    }
+
+    .small {
+      font-size: 13px;
+      opacity: 0.9
+    }
+
+    .confetti-canvas {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999
+    }
+
+    .footer {
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: 0.85
+    }
+
+    .muted {
+      opacity: 0.65;
+      font-size: 13px
+    }
+
+    @media (max-width:980px) {
+      .scene {
+        grid-template-columns: 1fr;
+      }
+
+      .gif {
+        width: 200px;
+        height: 200px
+      }
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      /* left: 0; */
+      width: 100%;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.35);
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      padding: 12px 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+    }
+
+    .navbar h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+      color: #333;
+    }
+
+    .navbar a {
+      padding: 5px;
+      background-color: #FEAAA9;
+      border: 2px solid #FFBCEA;
+      border-radius: 15px;
+      text-decoration: none;
+      color: #4c4c4c;
+      margin-left: 18px;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .navbar a:hover {
+      color: var(--accent2);
+    }
+
+    /* kontentin navbarla üst-üstə düşməməsi üçün */
+    body {
+      padding-top: 70px;
+      /* navbar hündürlüyü qədər boşluq */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="navbar">
+    <h2>Only for Firuzæ</h2>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="flappy.html">Flappy MiniGame</a>
+    </div>
+  </div>
+
+  <canvas id="confetti" class="confetti-canvas"></canvas>
+
+  <div class="scene">
+    <div class="card" role="region" aria-label="Kef paneli">
+      <h1>Mood Booster For Firuzæ</h1>
+      
+      <div id="message" class="message">Hazırsansa "Boost Mood!" düyməsini bas 🤗</div>
+
+      <div class="gif-wrap">
+        <img id="gif" class="gif" src="https://media.giphy.com/media/3oEduQAsYcJKQH2XsI/giphy.gif" alt="kef gif">
+      </div>
+
+      <div class="controls">
+        <button id="boostBtn" class="primary">Boost Mood!</button>
+        <button id="changeGifBtn" class="ghost">Change GIF</button>
+        <!-- <button id="shareBtn" class="ghost">Link yarat</button> -->
+        <!-- <button id="resetBtn" class="ghost">Sıfırla (xal)</button> -->
+      </div>
+
+      <div class="footer muted">Qeyd: Bu mood booster sadəcə Firuzæ üçündür 😜</div>
+    </div>
+
+    <script>
+
+      const messages = [
+        "Sən bu gün əfsanəsən! ✨",
+        "Gülüşün dünyanın ən yaxşı musiqisidir 😄",
+        "Kefi pozmaq qadağandır — gülümsə! 😎",
+        "Sən bacarıqlısan və hər şeyi bacararsan 💪",
+        "Balaca zəfərlər böyük xoşbəxtlik gətirir 🚀",
+        "Hər günün bir sürprizlə dolu ola bilər — inan!",
+        "Sənə bu gün uğurlar və dərin nəfəs göndərirəm 🌟",
+        "Dünya sənin gülüşünlə daha rənglidir 🌈",
+        "Bir fincan çay və yaxşı mahnı — sən hazırsan ☕🎶",
+        "Kafi istirahət bir möcüzədir — özünə yaxşılıq et 🛌",
+        "Sənin yanında hər şey daha asan görünür 🤗",
+        "Kiçik bir addım böyük məsafə yarada bilər 👣",
+        "Sən artıq çoxdan yaxşı iş görürsən — davam et!",
+        "Hər səhər yeni başlanğıcdır — bu gün sənin günündür 🌞",
+        "Gülüşünü gizlətmə — o çox qiymətlidir 😁",
+        "Sənə bir qutu pozitiv enerji göndərdim 📦✨",
+        "Bəzən bir nəfəs kifayətdir — dərin nəfəs al, rahatla.",
+        "Sənin ideyaların göyləri belə işıqlandırar 🌠",
+        "Bir az şirin, bir az komik — sən buna layiqsən 🍰",
+        "Sənin yanında insanlar daha xoşbəxtdirlər ❤️",
+        "Yaxşı işlərin tezliklə meyvəsini verəcək 🍎",
+        "Sən şanlısan — özünə inan!",
+        "Bu günün ən gözəl anı olacaq — gözlə və gör!",
+        "Hər gülüş səni bir az daha güclü edir 💥",
+        "Sən dəyərli, sən gözəlsən, sən vacibsən.",
+        "Kiçik bir gülüş böyük bir günə çevrilə bilər 😄",
+        "Ürəyin iş görsün, əllərin dinləsin — uğur yolundasan.",
+        "Sənə bir tomurcuk qədər sevgi göndərirəm 🌸",
+        "Sən dünyanı fərqli görən insansan — fəxr et!",
+        "Gülməyin ən yaxşı məşqdir — təkrarla! 😂",
+        "Heç kim sənin kimi deyildir — sən unikalsan.",
+        "Sənin enerjin başqalarını da ruhlandırır ✨",
+        "Bugünkü kiçik uğurun sabahın böyük qələbəsidir 🏆",
+        "Sənə xoşbəxt bir xəbər gəlsin — məncə gələcək!",
+        "Gülüşün bir o qədər də parlaqdır — paylaş!",
+        "Sən artıq bir başlanğıc etdin — davam et!",
+        "Bir az yumor, bir az sevgi — yaxşı günə doğru!",
+        "Hər problem bir dərsdir — sən həmin dərsi yaxşı öyrənirsən.",
+        "Sənə uğurlu və sevgi dolu anlar arzulayıram 💫",
+        "Sənin yanında insanlar toplanmaq istəyir 🤝",
+        "Sənə indi bir hədiyyə: böyük bir gülüş 🎁😁",
+        "Pozitiv enerji səninlə olsun — göndərildi!",
+        "Sən bir inspirasiya mənbəyisən — unutmayan!",
+        "Özünü yaxşı hiss etmək haqqındasan — qəbul et!",
+        "Sən artıq çox şey bacarmısan — daha da irəli!",
+        "Hər gün bir şansdır — bu şansı dəyərləndir!",
+        "Sən güclüsən, həssassan və inanılmazsan.",
+        "Gülümsə — bu, ətrafına hava kimi yayılır 🌬️🙂",
+        "Sənin ruhun rəqs etsin — ritmi hiss et!",
+        "Bir az macəra, bir az sərinlik — bu sənin günündür!",
+        "Sənə xoş sürprizlər dolu bir gün arzulayıram 🎉",
+        "Gözəllik içindədir — sən isə onu daşıyırsan.",
+        "Gülüşün hər problemi yüngülləşdirir — sınamağa dəyər!",
+        "Sən pozitiv bir dalğasan — dalğalan, yayıl!",
+        "Sənin uğurun başqalarına da yol açır 🌟",
+        "Bu gün bir komik şey görəcəysən — gözlərini aç!",
+        "Sən bir hekayə yazırsan — yalnız yaxşı fəsillər olsun.",
+        "Sənə bir az dincəlmə və çoxlu sevgi — yaxşı gələcək!",
+        "Sənin zəhmətin tezliklə mükafatlanacaq 🏅",
+        "Sənin olduğun yerdə enerji məna qazanır.",
+        "Gülmədən bir gün keçirmə — dünya bu qədər dar deyil!",
+        "Sən hər çətinliyi çevik bir şəkildə keçirsən — inan!",
+        "Sən öz taleyinin qəhrəmanısan — baş rol sənin!",
+        "Hər yeni fikir yeni macəradır — yaratmağa davam et!",
+        "Sən yaxşı insansan — bununla qürur duya bilərsən.",
+        "Sən bu gün başqa kimsə kimi deyilsən — özünü qeyd et!",
+        "Hər gülüş ürək üçün kiçik bir şənlikdir 🎈",
+        "Sənə uğurlar və şanslı anlar — yolun açıq olsun!",
+        "Güclü ol, yumşaq qal — ikisi də gözəldir.",
+        "Sənə bir qəhvə və böyük bir ideya göndərirəm ☕💡",
+        "Sənin enerjin pozitivdir — onu paylaşırsan və artırırsan.",
+        "Sən bir sənət əsərisən — gözəlliyi göstərməkdən qorxma.",
+        "Çətin anlar keçir — amma sən qalxan kimi qalxırsan.",
+        "Sən hər addımda bir şey öyrənirsən — bu qiymətsizdir.",
+        "Bu gün sənə yeni bir səbəb tapmaq üçün zaman ayır.",
+        "Sənin təbəssümün kiminsə gününü düzəldəcəkdir.",
+        "Səni görənlər daha yaxşı hiss edir — buna davam et!",
+        "Sənə qısa bir uğur hekayəsi: hər şey yaxşı olacaq.",
+        "Sənə pozitiv ruh, davamlı enerji və balaca qələbələr!",
+        "Sən çox yaradıcı və cəsursan — fikrini gerçəkləşdir!",
+        "Gülüşün ürəyimi isidir — paylaş və al!",
+        "Sənə bir parça sevinc və bir az mehribanlıq göndərdim.",
+        "Sən öz hekayəndə ən yaxşı hissəni yazırsan — davam!",
+        "Bu gün kiçik bir şans sənə baxır — al onu!",
+        "Sənin üçün bir xoruz bağıram: uğur gəlir! (gül.)",
+        "Hər kəs sənin enerjini hiss edir — gözəl işlər görürsən."
+      ];
+
+
+      const gifs = [
+        "https://media.giphy.com/media/3oEduQAsYcJKQH2XsI/giphy.gif",
+        "https://media.giphy.com/media/l4pTfx2qLszoacZRS/giphy.gif",
+        "https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif",
+        "https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif",
+        "https://media.giphy.com/media/1f7Aq3gqyA7qU/giphy.gif",
+        "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
+        "https://media.giphy.com/media/26n6WywJyh39n1pBu/giphy.gif",
+        "https://media.giphy.com/media/3ohs7KViF3RHz3y0A0/giphy.gif",
+        "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+        "https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif",
+        "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
+        "https://media.giphy.com/media/3o6Zt8zb1gCzQw5GSG/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsW3w2n2D2ywFzK/giphy.gif",
+        "https://media.giphy.com/media/3o6gbbuLW76jkt8vIc/giphy.gif",
+        "https://media.giphy.com/media/l0MYA9XlqQ3eQH6cE/giphy.gif",
+        "https://media.giphy.com/media/3orieV5p3O2u0/giphy.gif",
+        "https://media.giphy.com/media/3ov9jNziFTMfzSumAw/giphy.gif",
+        "https://media.giphy.com/media/3o7aCTfyhYawdOXcFW/giphy.gif",
+        "https://media.giphy.com/media/26BRrSvJUa0crqw4E/giphy.gif",
+        "https://media.giphy.com/media/3o6Zt8MgUuvSbkZYWc/giphy.gif",
+        "https://media.giphy.com/media/3oEduQAsYcJKQH2Xsi/giphy.gif",
+        "https://media.giphy.com/media/3o6Zth9kz1v3rUIQ8g/giphy.gif",
+        "https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif",
+        "https://media.giphy.com/media/26gsgId0d1n1vQwG0/giphy.gif",
+        "https://media.giphy.com/media/3o7aD7d5w1czjFf2sA/giphy.gif",
+        "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+        "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+        "https://media.giphy.com/media/3o6vXTdB0mK8Qj8sL6/giphy.gif",
+        "https://media.giphy.com/media/3o6ZtmF8Wb0qLxI6sU/giphy.gif",
+        "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif",
+        "https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif",
+        "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
+        "https://media.giphy.com/media/3oEjHGrVGrqgFFknfO/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsW3w2n2D2ywFzk/giphy.gif",
+        "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+        "https://media.giphy.com/media/xT0BKqhdlKCxCNsVTq/giphy.gif",
+        "https://media.giphy.com/media/3ohA2Y9wqgN2x1TqW8/giphy.gif",
+        "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
+        "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+        "https://media.giphy.com/media/3oEduQAsYcJKQH2XsI/giphy.gif",
+        "https://media.giphy.com/media/xT9DPl2Z2fQq2mKj5C/giphy.gif",
+        "https://media.giphy.com/media/3oEjHP8ELRNNlnlLGM/giphy.gif",
+        "https://media.giphy.com/media/3oEjHP8ELRNNlnlLGW/giphy.gif",
+        "https://media.giphy.com/media/1BXa2alBjrCXC/giphy.gif",
+        "https://media.giphy.com/media/l0HlQ7LRalVQvYfG0/giphy.gif",
+        "https://media.giphy.com/media/3o7aCTfyhYawdOXcFW/giphy.gif",
+        "https://media.giphy.com/media/3o6MblYZbqSgQbV6u0/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsZ8JqF7QxqGq4U/giphy.gif",
+        "https://media.giphy.com/media/3ov9jNziFTMfzSumAw/giphy.gif",
+        "https://media.giphy.com/media/3oEduQAsYcJKQH2Xsw/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsYQJ4cB2nTxL4o/giphy.gif",
+        "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
+        "https://media.giphy.com/media/3o6ZtPXKB6dYVQY4Na/giphy.gif",
+        "https://media.giphy.com/media/3ov9jNziFTMfzSumA0/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsZ8JqF7QxqGq4A/giphy.gif",
+        "https://media.giphy.com/media/26BRrSvJUa0crqw4E/giphy.gif",
+        "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif",
+        "https://media.giphy.com/media/3ohs7KViF3RHz3y0A0/giphy.gif",
+        "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+        "https://media.giphy.com/media/3ohc0W2R6o0Pp6fVQk/giphy.gif",
+        "https://media.giphy.com/media/3o6gbbuLW76jkt8vIc/giphy.gif",
+        "https://media.giphy.com/media/3oEhn3Kx5dO3jR9Yxi/giphy.gif",
+        "https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif",
+        "https://media.giphy.com/media/3o7qE1YN7aBOFPRw8E/giphy.gif",
+        "https://media.giphy.com/media/l2JhLz0vXo2b3lJ5i/giphy.gif",
+        "https://media.giphy.com/media/3o85xnoIXebk3xYxGk/giphy.gif",
+        "https://media.giphy.com/media/26BRuo6sLetdllPAQ/giphy.gif",
+        "https://media.giphy.com/media/1zSz5MVwEPVJq/giphy.gif",
+        "https://media.giphy.com/media/3o6Zt8zb1gCzQw5GSG/giphy.gif",
+        "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+        "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+        "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+        "https://media.giphy.com/media/3ov9jNziFTMfzSumAw/giphy.gif",
+        "https://media.giphy.com/media/3oEjHGrVGrqgFFknfO/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsW3w2n2D2ywFzK/giphy.gif",
+        "https://media.giphy.com/media/l4pTfx2qLszoacZRS/giphy.gif",
+        "https://media.giphy.com/media/3o7aCTfyhYawdOXcFW/giphy.gif",
+        "https://media.giphy.com/media/3ohA2Y9wqgN2x1TqW8/giphy.gif",
+        "https://media.giphy.com/media/3o6ZtmF8Wb0qLxI6sU/giphy.gif",
+        "https://media.giphy.com/media/26n6WywJyh39n1pBu/giphy.gif",
+        "https://media.giphy.com/media/3ohs7KViF3RHz3y0A0/giphy.gif",
+        "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
+        "https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif",
+        "https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif",
+        "https://media.giphy.com/media/3o6MblYZbqSgQbV6u0/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsZ8JqF7QxqGq4U/giphy.gif",
+        "https://media.giphy.com/media/xT0BKqhdlKCxCNsVTq/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsYQJ4cB2nTxL4o/giphy.gif",
+        "https://media.giphy.com/media/3oEduQAsYcJKQH2XsI/giphy.gif",
+        "https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif",
+        "https://media.giphy.com/media/3o7aD7d5w1czjFf2sA/giphy.gif",
+        "https://media.giphy.com/media/xT9DPl2Z2fQq2mKj5C/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsW3w2n2D2ywFzk/giphy.gif",
+        "https://media.giphy.com/media/3oEjHP8ELRNNlnlLGM/giphy.gif",
+        "https://media.giphy.com/media/3o6vXTdB0mK8Qj8sL6/giphy.gif",
+        "https://media.giphy.com/media/3o6Zth9kz1v3rUIQ8g/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsZ8JqF7QxqGq4A/giphy.gif",
+        "https://media.giphy.com/media/3o6gbbuLW76jkt8vIc/giphy.gif",
+        "https://media.giphy.com/media/26BRrSvJUa0crqw4E/giphy.gif",
+        "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif",
+        "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+        "https://media.giphy.com/media/3oEduQAsYcJKQH2XsX/giphy.gif",
+        "https://media.giphy.com/media/3o6ZtPXKB6dYVQY4Na/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsW3w2n2D2ywFzJ/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsW3w2n2D2ywFzM/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsW3w2n2D2ywFzN/giphy.gif"
+      ];
+
+
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      }
+
+
+      let messageOrder = [];
+      let gifOrder = [];
+      function resetOrders() {
+        messageOrder = messages.map((_, i) => i);
+        gifOrder = gifs.map((_, i) => i);
+        shuffle(messageOrder);
+        shuffle(gifOrder);
+        updateRemaining();
+      }
+      resetOrders();
+
+      function updateRemaining() {
+        const remMsg = document.getElementById('remainingMessages');
+        const remGif = document.getElementById('remainingGifs');
+        if (remMsg) remMsg.textContent = messageOrder.length;
+        if (remGif) remGif.textContent = gifOrder.length;
+      }
+
+      function nextMessage() {
+        if (messageOrder.length === 0) {
+          resetOrders();
+        }
+        const idx = messageOrder.pop();
+        updateRemaining();
+        return messages[idx];
+      }
+      let lastGifIndex = null;
+      function nextGif() {
+        if (gifOrder.length === 0) {
+          resetOrders();
+        }
+
+        let idx = gifOrder.pop();
+        let attempts = 0;
+        while (idx === lastGifIndex && gifOrder.length > 0 && attempts < 6) {
+          gifOrder.unshift(idx);
+          idx = gifOrder.pop();
+          attempts++;
+        }
+        if (idx === lastGifIndex) {
+        }
+        lastGifIndex = idx;
+        updateRemaining();
+        return gifs[idx];
+      }
+
+
+      const msgEl = document.getElementById('message');
+      const gifEl = document.getElementById('gif');
+      const boostBtn = document.getElementById('boostBtn');
+      const changeGifBtn = document.getElementById('changeGifBtn');
+      const shareBtn = document.getElementById('sharereBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      let boostCount = 0;
+
+      const confettiCanvas = document.getElementById('confetti');
+      const ctx = confettiCanvas.getContext('2d');
+      function resizeCanvas() { confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; }
+      addEventListener('resize', resizeCanvas); resizeCanvas();
+
+      const particles = [];
+      function spawnConfetti(x, y) {
+        for (let i = 0; i < 80; i++) {
+          particles.push({
+            x, y,
+            vx: (Math.random() - 0.5) * 10,
+            vy: Math.random() * -10 - 2,
+            size: 4 + Math.random() * 8,
+            rot: Math.random() * 360,
+            vr: Math.random() * 8 - 4,
+            life: 60 + Math.random() * 60,
+            color: `hsl(${Math.random() * 360},80%,60%)`
+          });
+        }
+      }
+      function updateParticles() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.life--; p.vy += 0.45; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
+          ctx.fillStyle = p.color; ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+          if (p.life <= 0 || p.y > confettiCanvas.height + 50) particles.splice(i, 1);
+        }
+        requestAnimationFrame(updateParticles);
+      }
+      requestAnimationFrame(updateParticles);
+
+      function popSound() {
+        try {
+          const ac = new (window.AudioContext || window.webkitAudioContext)();
+          const o = ac.createOscillator(); const g = ac.createGain();
+          o.type = 'sine'; o.frequency.setValueAtTime(700, ac.currentTime);
+          g.gain.setValueAtTime(0.0001, ac.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.22, ac.currentTime + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.45);
+          o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + 0.5);
+        } catch (e) {
+        }
+      }
+
+
+      function boost(fromX, fromY) {
+        const message = nextMessage();
+        const gif = nextGif();
+        msgEl.textContent = message;
+        gifEl.classList.remove('pop'); void gifEl.offsetWidth;
+        gifEl.src = gif;
+        gifEl.classList.add('pop');
+
+        spawnConfetti(fromX || innerWidth / 2, fromY || innerHeight / 3);
+        popSound();
+        boostCount++;
+        const countElem = document.getElementById('count');
+        if (countElem) countElem.textContent = boostCount;
+      }
+
+      function changeGif() {
+        const gif = nextGif();
+        gifEl.classList.remove('pop'); void gifEl.offsetWidth;
+        gifEl.src = gif;
+        gifEl.classList.add('pop');
+        spawnConfetti(innerWidth / 2, innerHeight / 3);
+        popSound();
+      }
+
+      boostBtn.addEventListener('click', (e) => { boost(e.clientX, e.clientY); });
+      changeGifBtn.addEventListener('click', changeGif);
+
+      shareBtn.addEventListener('click', () => {
+        const payload = { m: msgEl.textContent, g: gifEl.src };
+        try {
+          const s = btoa(encodeURIComponent(JSON.stringify(payload)));
+          const link = location.origin + location.pathname + '#share=' + s;
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(link).then(() => alert('Link panoya kopyalandı — dostuna göndər!'));
+          } else {
+            prompt('Linki kopyala:', link);
+          }
+        } catch (e) {
+          prompt('Linki kopyala:', location.href);
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        boostCount = 0;
+        const countElem = document.getElementById('count');
+        if (countElem) countElem.textContent = boostCount;
+        resetOrders();
+        alert('Xal sıfırlandı və siyahılar yenidən qarışdırıldı.');
+      });
+
+      function checkShare() {
+        if (location.hash.startsWith('#share=')) {
+          try {
+            const b = location.hash.replace('#share=', '');
+            const decoded = JSON.parse(decodeURIComponent(atob(b)));
+            if (decoded.m) msgEl.textContent = decoded.m;
+            if (decoded.g) gifEl.src = decoded.g;
+            spawnConfetti(innerWidth / 2, innerHeight / 3);
+          } catch (e) { console.log('share decode failed', e); }
+        }
+      }
+      checkShare();
+
+      addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          boost();
+        }
+
+        if (e.key && e.key.toLowerCase() === 'g') {
+          changeGif();
+        }
+      });
+
+      boostBtn.focus();
+
+    </script>
+</body>
+
+</html>
